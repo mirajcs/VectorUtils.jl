@@ -1,4 +1,4 @@
-[project]
+[package]
 name = "VectorUtils"
 uuid = "ce5ad29b-8b1a-4d19-a814-cc15ce7eccd1"
 version = "0.1.1"
