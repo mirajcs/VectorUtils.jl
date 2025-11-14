@@ -1,0 +1,16 @@
+name = "VectorUtils"
+uuid = "ce5ad29b-8b1a-4d19-a814-cc15ce7eccd1"
+version = "0.1.0"
+authors = ["Miraj Samarakkody <miraj.samarakkody@gmail.com>"]
+
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+SymPy = "24249f21-da20-56a4-8eb1-6a02cf4ae2e6"
+
+[compat]
+LinearAlgebra = "1.12.0"
+QuadGK = "2.11.2"
+Revise = "3.12.1"
+SymPy = "2.3.3"
