@@ -25,19 +25,19 @@ jobs:
         with:
           version: ${{ matrix.version }}
 
-      # Install Julia dependencies 
+      # Install Julia dependencies
       - name: Install dependencies
         run: julia --project=. -e 'using Pkg; Pkg.instantiate()'
 
-      # Force PyCall to use Conda before testing
+      # Force PyCall to use Julia Conda (accessing through SymPy)
       - name: Force PyCall to use Julia Conda
         run: |
-            julia --project=. -e 'ENV["PYTHON"] = ""; using Pkg; Pkg.build("PyCall")'
+            julia --project=. -e 'using SymPy; ENV["PYTHON"] = ""; using Pkg; Pkg.build("PyCall")'
 
-      # Install SymPy inside Conda
+      # Install SymPy in Conda (accessing PyCall through SymPy)
       - name: Install SymPy
         run: |
-            julia --project=. -e 'using PyCall; pyimport_conda("sympy", "sympy")'
+            julia --project=. -e 'using SymPy; SymPy.PyCall.pyimport_conda("sympy", "sympy")'
 
       # Run tests
       - name: Run tests
