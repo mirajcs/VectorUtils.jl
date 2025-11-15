@@ -33,7 +33,7 @@ t₀ = π/4
 
 
 T = Tangent(r, t, t₀) 
-N = Norm
+N = Norm(r, t, t₀) 
 
 # Curvature 
 κ = Curvature(r, t, t₀)
@@ -95,11 +95,11 @@ For detailed documentation, examples, and API reference, visit:
 
 VectorUtils implements the Frenet-Serret formulas for space curves:
 
-- **Tangent**: T(t) = r'(t) / ||r'(t)||
-- **Curvature**: κ(t) = ||r'(t) × r''(t)|| / ||r'(t)||³
-- **Normal**: N(t) = T'(t) / ||T'(t)||
-- **Binormal**: B(t) = T(t) × N(t)
-- **Torsion**: τ(t) = (r'(t) × r''(t)) · r'''(t) / ||r'(t) × r''(t)||²
+- **Tangent**: $T(t) = \dfrac{r'(t)}{||r'(t)||}$
+- **Curvature**: $\kappa(t) = \dfrac{||r'(t) × r''(t)||}{||r'(t)||^3}$
+- **Normal**: $N(t) = \dfrac{T'(t)}{ ||T'(t)||}$
+- **Binormal**: $B(t) = T(t) × N(t)$
+- **Torsion**: $τ(t) = \dfrac{(r'(t) × r''(t)) · r'''(t)}{||r'(t) × r''(t)||^2}$
 
 ## Contributing
 
