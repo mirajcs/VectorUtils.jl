@@ -1,61 +1,56 @@
 # VectorUtils.jl
 
-*A Julia package for computing vector calculus properties of parametric curves*
+A Julia package providing utilities for vector operations.
 
 ## Overview
 
-VectorUtils.jl provides comprehensive tools for analyzing parametric vector curves, including:
+VectorUtils.jl offers a collection of efficient and convenient functions for working with vectors in Julia, including:
 
-- **Tangent vectors** (symbolic and numeric)
-- **Frenet-Serret frames** (tangent, normal, binormal vectors)
-- **Curvature** computation
-- **Torsion** computation
-- Support for both symbolic (analytical) and numeric computations
+- Vector operations: Norm, normalization, dot products, and cross products
+- Geometric computations: Angles between vectors, projections, and distance calculations
+- Parametric geometry: Line and plane equations in 3D space
+- Curve analysis: Arc length, tangent vectors, curvature, normal vectors, binormal vectors, torsion and Frenet-Serret frame. 
+- Symbolic and numeric support: All functions work with both numeric values and symbolic expressions via SymPy
 
-## Features
-
--  **Dual Mode**: Work with both symbolic expressions and numeric evaluations
--  **Complete Frenet Frame**: Compute T, N, B vectors for any parametric curve
--  **Geometric Properties**: Calculate curvature κ(t) and torsion τ(t)
--  **Flexible Input**: Handle 2D and 3D parametric curves
--  **Optimized**: Efficient algorithms for both analytical and numerical methods
-
+Whether you're doing computational geometry, differential geometry, or general vector calculus, VectorUtils.jl provides the essential tools you need.
 
 ## Installation
-
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/mirajcs/VectorUtils")
+Pkg.add("VectorUtils")
 ```
 
-Or in the Pkg REPL mode (press `]`):
+For symbolic computation support, also install SymPy.jl
+```julia
+Pkg.add("SymPy")
+```
+
+## Quick Start
+```julia
+using VectorUtils
+using SymPy
+
+# Example usage
+julia> @syms x y z l m n 
+julia> Cross([x,y,z],[l,m,n])
+
+[
+y*n - z*m,
+z*l - x*n,
+x*m - y*l
+]
 
 ```
-add https://github.com/mirajcs/VectorUtils
-```
 
-## Mathematical Background
-
-For a parametric curve **r**(t) = [x(t), y(t), z(t)], VectorUtils computes:
-
-**Tangent Vector**: **T**(t) = **r**'(t) / ||**r**'(t)||
-
-**Curvature**: κ(t) = ||**r**'(t) × **r**''(t)|| / ||**r**'(t)||³
-
-**Normal Vector**: **N**(t) = **T**'(t) / ||**T**'(t)||
-
-**Binormal Vector**: **B**(t) = **T**(t) × **N**(t)
-
-**Torsion**: τ(t) = (**r**'(t) × **r**''(t)) · **r**'''(t) / ||**r**'(t) × **r**''(t)||²
-
-## Contents
-
+## Documentation Contents
 ```@contents
-Pages = ["getting_started.md", "api/core.md", "examples/basic.md", "theory.md"]
+Pages = [
+    "api.md"
+]
 Depth = 2
 ```
 
 ## Index
-
 ```@index
 ```
+

@@ -2,24 +2,48 @@ module VectorUtils
 
 greet() = print("Hello Geometrician")
 
-export Norm, Normalize, Dot, Cross, Angle, Projection, ParametricLine, PlaneEquation, ArcLength, ArcLengthParametrization, Tangent, Curvature, Normal, Binormal
-
+export Norm, Normalize, Dot, Cross, Angle, Projection, ParametricLine, PlaneEquation, ArcLength, ArcLengthParametrization, Tangent, Curvature, Normal, Binormal, Torsion, FrenetSerret
 
 using LinearAlgebra, SymPy, QuadGK
 
-# Compute the Euclidean norm of vector 'v'
+"""
+    Norm(v::AbstractVector)
 
-# numeric version
+Compute the Euclidean norm (magnitude) of vector `v`.
+
+Supports both numeric and symbolic vectors.
+
+# Examples
+```julia
+julia> Norm([3.0, 4.0])
+5.0
+
+julia> @syms x y
+julia> Norm([x, y])
+sqrt(x^2 + y^2)
+```
+"""
 Norm(v::AbstractVector{<:Number}) = norm(v)
 
-# symbolic version
 function Norm(v::AbstractVector{<:Sym})
     return simplify(sqrt(sum(x->x^2, v)))
 end
 
-# Return the unit vector in the direction of `v`
+"""
+    Normalize(v::AbstractVector)
 
-# Numerical 
+Return the unit vector in the direction of `v`.
+
+Supports both numeric and symbolic vectors.
+
+# Examples
+```julia
+julia> Normalize([3.0, 4.0])
+2-element Vector{Float64}:
+ 0.6
+ 0.8
+```
+"""
 function Normalize(v::AbstractVector{<:Real})
     n = Norm(v)
     if n == 0
@@ -29,15 +53,25 @@ function Normalize(v::AbstractVector{<:Real})
     return normalize
 end 
 
-# symbolic
 function Normalize(v::AbstractVector{<:Sym})
     n = Norm(v)
     normalize = [v[i] / n for i in 1:length(v)]
     return simplify(normalize)
 end
 
-# compute the dot product of two vectors 
+"""
+    Dot(a::AbstractVector, b::AbstractVector)
 
+Compute the dot product of two vectors `a` and `b`.
+
+Supports both numeric and symbolic vectors.
+
+# Examples
+```julia
+julia> Dot([1, 2, 3], [4, 5, 6])
+32
+```
+"""
 Dot(a::AbstractVector{<:Real}, b::AbstractVector{<:Real}) = dot(a, b)
 
 function Dot(a::AbstractVector{<:Sym}, b::AbstractVector{<:Sym})
@@ -45,8 +79,22 @@ function Dot(a::AbstractVector{<:Sym}, b::AbstractVector{<:Sym})
     return sum(a[i]*b[i] for i in 1:length(a))
 end
 
-# compute the cross product 
+"""
+    Cross(a::AbstractVector, b::AbstractVector)
 
+Compute the cross product of two 3D vectors `a` and `b`.
+
+Supports both numeric and symbolic vectors.
+
+# Examples
+```julia
+julia> Cross([1, 0, 0], [0, 1, 0])
+3-element Vector{Int64}:
+ 0
+ 0
+ 1
+```
+"""
 function Cross(a::AbstractVector{<:Real}, b::AbstractVector{<:Real})
     if length(a) != 3 || length(b) != 3
         error("Cross product is only defined for 3D Vectors")
@@ -63,7 +111,19 @@ function Cross(a::AbstractVector{<:Sym}, b::AbstractVector{<:Sym})
     ]
 end
 
-# compute the angle between two vectors, the unit is radian 
+"""
+    Angle(a::AbstractVector, b::AbstractVector)
+
+Compute the angle between two vectors `a` and `b` in radians.
+
+Supports both numeric and symbolic vectors.
+
+# Examples
+```julia
+julia> Angle([1, 0], [0, 1])
+1.5707963267948966  # π/2
+```
+"""
 function Angle(a::AbstractVector{<:Real}, b::AbstractVector{<:Real})
     return acos(clamp(Dot(a, b) / (Norm(a)*Norm(b)), -1.0, 1.0))
 end
@@ -72,7 +132,21 @@ function Angle(a::AbstractVector{<:Sym}, b::AbstractVector{<:Sym})
     return acos(Dot(a, b) / (Norm(a)*Norm(b)))
 end
 
-# Project vector a onto b 
+"""
+    Projection(a::AbstractVector, b::AbstractVector)
+
+Project vector `a` onto vector `b`.
+
+Returns the vector projection of `a` onto `b`.
+
+# Examples
+```julia
+julia> Projection([3, 4], [1, 0])
+2-element Vector{Float64}:
+ 3.0
+ 0.0
+```
+"""
 function Projection(a::AbstractVector{<:Real}, b::AbstractVector{<:Real})
     if Norm(b) == 0
         error("Cannot project onto the zero vector")
@@ -84,7 +158,22 @@ function Projection(a::AbstractVector{<:Sym}, b::AbstractVector{<:Sym})
     return Dot(a, b)/Dot(b, b)*b
 end
 
-# parametric equation for the line through the point x and parallel to the direction of the vector v in 3D
+"""
+    ParametricLine(x::AbstractVector, v::AbstractVector)
+
+Generate the parametric equation for a line through point `x` parallel to direction vector `v` in 3D.
+
+Returns a parametric expression in terms of parameter `t`.
+
+# Examples
+```julia
+julia> ParametricLine([1, 2, 3], [1, 0, 0])
+3-element Vector:
+ t + 1
+ 2
+ 3
+```
+"""
 function ParametricLine(x::AbstractVector{<:Real}, v::AbstractVector{<:Real})
     @syms t
     if length(x) != 3 || length(v) != 3
@@ -102,10 +191,18 @@ function ParametricLine(x::AbstractVector{<:Sym}, v::AbstractVector{<:Sym})
 end
 
 """
-If we have the point of a plane and normal vector we have the following procedure. 
-"""
+    PlaneEquation(p::AbstractVector, n::AbstractVector)
 
-# Equation for a plane 
+Generate the equation for a plane given a point `p` on the plane and normal vector `n`.
+
+Returns the plane equation in the form: n₁x + n₂y + n₃z - d = 0
+
+# Examples
+```julia
+julia> PlaneEquation([0, 0, 1], [0, 0, 1])
+z - 1
+```
+"""
 function PlaneEquation(p::AbstractVector{<:Real}, n::AbstractVector{<:Real})
     @syms x y z
     if length(p) != 3 || length(n) != 3
@@ -123,9 +220,20 @@ function PlaneEquation(p::AbstractVector{<:Sym}, n::AbstractVector{<:Sym})
 end
 
 """
-Arc length for parametrized curve
-"""
+    ArcLength(curve::Vector, t::Sym, a, b; symbolic=true)
 
+Compute the arc length of a parametrized curve from parameter value `a` to `b`.
+
+# Arguments
+- `curve::Vector`: Parametric curve components [x(t), y(t), z(t)]
+- `t::Sym`: Parameter symbol
+- `a`: Starting parameter value
+- `b`: Ending parameter value
+- `symbolic::Bool`: If true, attempts symbolic integration; otherwise uses numerical integration
+
+# Returns
+Arc length value (symbolic or numeric)
+"""
 function ArcLength(curve::Vector, t::Sym, a, b; symbolic=true)
     
     # Compute derivatives
@@ -162,9 +270,18 @@ function ArcLength(curve::Vector, t::Sym, a, b; symbolic=true)
 end
 
 """
-Arc Length prametrization 
-"""
+    ArcLengthParametrization(curve::Vector, s::Sym; symbolic=true)
 
+Compute the arc length parametrization of a curve.
+
+# Arguments
+- `curve::Vector`: Parametric curve components
+- `s::Sym`: Parameter symbol for the curve
+- `symbolic::Bool`: If true, attempts symbolic integration
+
+# Returns
+Arc length function s(t)
+"""
 function ArcLengthParametrization(curve::Vector, s::Sym; symbolic=true)
     @syms t 
     
@@ -189,10 +306,19 @@ function ArcLengthParametrization(curve::Vector, s::Sym; symbolic=true)
 end
 
 """
-The tangent vector for the curve is given by r'(t)/|r'(t)|
-"""
+    Tangent(curve::Vector, t::Sym, t_val=nothing)
 
-function Tangent(curve::Vector, t::Sym,  t_val=nothing)
+Compute the unit tangent vector T(t) = r'(t)/|r'(t)| for a parametric curve.
+
+# Arguments
+- `curve::Vector`: Parametric curve components
+- `t::Sym`: Parameter symbol
+- `t_val`: Optional numeric value to evaluate at
+
+# Returns
+Unit tangent vector
+"""
+function Tangent(curve::Vector, t::Sym, t_val=nothing)
 
     # Compute derivative of each component
     derivative = [diff(c, t) for c in curve]
@@ -212,33 +338,49 @@ function Tangent(curve::Vector, t::Sym,  t_val=nothing)
 end
 
 """
-Curvature of a curve is given by k  = |r'(t) x r''(t)|/|r'(t)|^3
-"""
+    Curvature(curve::Vector, t::Sym, t_val=nothing)
 
-function Curvature(curve::Vector, t::Sym ,t_val = nothing)
+Compute the curvature κ = |r'(t) × r''(t)|/|r'(t)|³ of a 3D parametric curve.
+
+# Arguments
+- `curve::Vector`: 3D parametric curve components
+- `t::Sym`: Parameter symbol
+- `t_val`: Optional numeric value to evaluate at
+
+# Returns
+Curvature value
+"""
+function Curvature(curve::Vector, t::Sym, t_val=nothing)
     @assert length(curve) == 3
 
-    #compute the first deirvative
+    #compute the first derivative
     first_derivative = [diff(c,t) for c in curve]
     #compute the second derivative
     second_derivative = [diff(c1, t) for c1 in first_derivative]
     cross_product = Cross(first_derivative, second_derivative)
     curvature = Norm(cross_product)/(Norm(first_derivative))^3
 
-    if t_val !==nothing
+    if t_val !== nothing
         curvature = subs(curvature, t => t_val)
     end
 
     return curvature
-
 end
 
 """
-Normal is given by N(t) = T'(t)/|T'(t)|
+    Normal(curve::Vector, t::Sym, t_val=nothing)
+
+Compute the principal normal vector N(t) = T'(t)/|T'(t)| for a 3D parametric curve.
+
+# Arguments
+- `curve::Vector`: 3D parametric curve components
+- `t::Sym`: Parameter symbol
+- `t_val`: Optional numeric value to evaluate at
+
+# Returns
+Principal normal vector
 """
-
-
-function Normal(curve::Vector, t::Sym, t_val = nothing) 
+function Normal(curve::Vector, t::Sym, t_val=nothing) 
 
     @assert length(curve) == 3
 
@@ -254,16 +396,24 @@ function Normal(curve::Vector, t::Sym, t_val = nothing)
         N = [subs(Ni, t => t_val) for Ni in N]
     end
     return N 
-    
 end
 
 """
-Binormal vector is given by B(t) = T(t) x N(T)
-"""
+    Binormal(curve::Vector, t::Sym, t_val=nothing)
 
-function Binormal(curve::Vector, t::Sym, t_val = nothing)
+Compute the binormal vector B(t) = T(t) × N(t) for a 3D parametric curve.
+
+# Arguments
+- `curve::Vector`: 3D parametric curve components
+- `t::Sym`: Parameter symbol
+- `t_val`: Optional numeric value to evaluate at
+
+# Returns
+Binormal vector
+"""
+function Binormal(curve::Vector, t::Sym, t_val=nothing)
     @assert length(curve) == 3
-    B_vec = simplify(Cross(Tangent(curve,t) , Normal(curve, t)))
+    B_vec = simplify(Cross(Tangent(curve,t), Normal(curve, t)))
 
     if t_val !== nothing
         B_vec = [simplify(subs(Bi, t => t_val)) for Bi in B_vec]
@@ -271,7 +421,64 @@ function Binormal(curve::Vector, t::Sym, t_val = nothing)
     return B_vec 
 end
 
+"""
+    Torsion(curve::Vector, t::Sym, t_val=nothing)
 
+Compute the torsion τ = (r'(t) × r''(t)) · r'''(t) / |r'(t) × r''(t)|² of a 3D parametric curve.
 
+# Arguments
+- `curve::Vector`: 3D parametric curve components
+- `t::Sym`: Parameter symbol
+- `t_val`: Optional numeric value to evaluate at
+
+# Returns
+Torsion value
+"""
+function Torsion(curve::Vector, t::Sym, t_val=nothing)
+    @assert length(curve) == 3
+    
+    #compute the first derivative
+    first_derivative = [diff(c,t) for c in curve]
+    #compute the second derivative
+    second_derivative = [diff(c1, t) for c1 in first_derivative]
+    #compute the third derivative
+    third_derivative = [diff(c2, t) for c2 in second_derivative]
+    #cross product of first and second derivative
+    cross_product = Cross(first_derivative, second_derivative)
+    if Norm(cross_product) == 0
+        error("Torsion is undefined at this point as the cross product of first and second derivative is zero.")
+    else
+        torsion = Dot(cross_product, third_derivative)/(Norm(cross_product))^2
+
+        if t_val !== nothing
+            torsion = subs(torsion, t => t_val)
+        end
+    end
+
+    return torsion
+end
+
+"""
+    FrenetSerret(curve::Vector, t::Sym, t_val=nothing)
+
+    Compute the Frenet-Serret frame (Tangent, Normal, Binormal).
+
+    #Arguments 
+    - 'curve::Vector': 3D Parametric curve components
+    - 't::Sym': Parameter symbol
+    - 't_val': Optional numeric value to evaluate at
+
+    #Returns 
+    Tuple of (Tangent, Normal, Binormal) vectors. 
+
+"""
+
+function FrenetSerret(curve::Vector, t::Sym, t_val=nothing)
+    T = Tangent(curve, t, t_val)
+    N = Normal(curve, t, t_val)
+    B = Binormal(curve, t, t_val)
+
+    return (T, N, B)
+end
 
 end # module VectorUtils

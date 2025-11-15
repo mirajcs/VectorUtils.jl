@@ -533,6 +533,153 @@ end
 end 
 end
 
+@testset "Torsion Tests" begin
+    println("\n" * "="^50)
+    println("Torsion tests")
+    println("="^50)
+
+    
+    # ---------------------------------------------
+    # 1. Torsion of a circle in the xy-plane (should be zero)
+    # r(t) = [cos t, sin t, 0]
+    t = symbols("t", real=true)
+    curve1 = [cos(t), sin(t), 0]
+
+    @testset "Planar Circle" begin
+        τ_sym = Torsion(curve1, t)
+        @test simplify(τ_sym) == 0
+
+        τ_num = Torsion(curve1, t, 1.2)
+        @test τ_num == 0
+    end
+
+    # ---------------------------------------------
+    # 2. Torsion of a helix (constant nonzero)
+    # r(t) = [cos t, sin t, t]
+    # Known torsion = 1 / (1 + 1)^2 = 1/2
+    curve2 = [cos(t), sin(t), t]
+
+    @testset "Circular Helix" begin
+        τ_sym2 = Torsion(curve2, t)
+        τ_simplified = simplify(τ_sym2)
+        @test τ_simplified == 1/2
+
+        τ_num2 = Torsion(curve2, t, 0.3)
+        @test isapprox(N(τ_num2), 0.5; atol=1e-6)
+    end
+
+    # ---------------------------------------------
+    # 3. Straight line (torsion undefined or zero)
+    # r(t) = [t, 0, 0]
+    # First and second derivatives parallel → torsion should be 0
+    curve3 = [t, 0, 0]
+
+    @testset "Straight Line" begin
+        @test_throws ErrorException Torsion(curve3, t)
+    end
+end
+
+
+@testset "FrenetSerret Tests" begin
+    println("\n" * "="^50)
+    println("FrenetSerret tests")
+    println("="^50)
+
+    t = symbols("t", real=true)
+    
+    # ---------------------------------------------
+    # 1. Circular Helix - verify orthonormal frame
+    # r(t) = [cos t, sin t, t]
+    curve1 = [cos(t), sin(t), t]
+
+    @testset "Circular Helix - Orthonormality" begin
+        T, N, B = FrenetSerret(curve1, t)
+        
+        # Verify the frame is orthonormal
+        @test simplify(Dot(T, T)) == 1
+        @test simplify(Dot(N, N)) == 1
+        @test simplify(Dot(B, B)) == 1
+        @test simplify(Dot(T, N)) == 0
+        @test simplify(Dot(T, B)) == 0
+        @test simplify(Dot(N, B)) == 0
+    end
+
+    # ---------------------------------------------
+    # 2. Circular Helix at t=0
+    @testset "Circular Helix at t=0" begin
+        T, N, B = FrenetSerret(curve1, t, 0)
+        
+        # At t=0: curve is (1, 0, 0)
+        @test isapprox(T[1], 0.0; atol=1e-10)
+        @test isapprox(T[2], sqrt(2)/2; atol=1e-10)
+        @test isapprox(T[3], sqrt(2)/2; atol=1e-10)
+        
+        @test isapprox(N[1], -1.0; atol=1e-10)
+        @test isapprox(N[2], 0.0; atol=1e-10)
+        @test isapprox(N[3], 0.0; atol=1e-10)
+        
+        @test isapprox(B[1], 0.0; atol=1e-10)
+        @test isapprox(B[2], -sqrt(2)/2; atol=1e-10)
+        @test isapprox(B[3], sqrt(2)/2; atol=1e-10)
+    end
+
+    # ---------------------------------------------
+    # 3. Circle in xy-plane at t=π/2
+    # r(t) = [2*cos t, 2*sin t, 0]
+    curve2 = [2*cos(t), 2*sin(t), 0]
+
+    @testset "Circle in xy-plane" begin
+        T, N, B = FrenetSerret(curve2, t, PI/2)
+        
+        # At t=π/2: curve is (0, 2, 0)
+        # T is tangent to circle, N points toward center, B points in z-direction
+        @test isapprox(T[1], -1.0; atol=1e-10)
+        @test isapprox(T[2], 0.0; atol=1e-10)
+        @test isapprox(T[3], 0.0; atol=1e-10)
+        
+        @test isapprox(N[1], 0.0; atol=1e-10)
+        @test isapprox(N[2], -1.0; atol=1e-10)
+        @test isapprox(N[3], 0.0; atol=1e-10)
+        
+        @test isapprox(B[1], 0.0; atol=1e-10)
+        @test isapprox(B[2], 0.0; atol=1e-10)
+        @test isapprox(B[3], 1.0; atol=1e-10)
+    end
+
+
+    # ---------------------------------------------
+    # 4. Parabolic Path - verify orthonormality at t=1
+    # r(t) = [t, t^2, 0]
+    curve4 = [t, t^2, 0]
+
+    @testset "Parabolic Path Orthonormality" begin
+        T, N, B = FrenetSerret(curve4, t, 1)
+        
+        # Verify orthonormality at t=1
+        @test isapprox(Dot(T, T), 1.0; atol=1e-10)
+        @test isapprox(Dot(N, N), 1.0; atol=1e-10)
+        @test isapprox(Dot(B, B), 1.0; atol=1e-10)
+        @test isapprox(Dot(T, N), 0.0; atol=1e-10)
+        @test isapprox(Dot(T, B), 0.0; atol=1e-10)
+        @test isapprox(Dot(N, B), 0.0; atol=1e-10)
+    end
+
+
+    # ---------------------------------------------
+    # 5. Symbolic Return (no t_val specified)
+    @testset "Symbolic Return" begin
+        T, N, B = FrenetSerret(curve1, t)
+        
+        # Should return symbolic expressions
+        @test T isa Vector
+        @test N isa Vector
+        @test B isa Vector
+        @test length(T) == 3
+        @test length(N) == 3
+        @test length(B) == 3
+    end
+end
+
 
 
 

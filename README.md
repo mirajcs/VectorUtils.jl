@@ -35,9 +35,9 @@ t₀ = π/4
 T = Tangent(r, t, t₀) 
 N = Norm
 
-# Curvature and torsion
+# Curvature 
 κ = Curvature(r, t, t₀)
-τ = Torsion(r, t, t₀)
+
 
 ```
 
@@ -55,13 +55,13 @@ T_sym = Tangent(r_sym, t)
 # Symbolic curvature
 κ_sym = Curvature(r_sym, t)
 ```
-
+<!--
 ## Examples
 
 ### Circle
 ```julia
 # Parametric circle in the xy-plane
-circle(t) = [cos(t), sin(t), 0]
+circle = [cos(t), sin(t), 0]
 
 κ = curvature(circle, 0.0)  # κ = 1 (constant)
 τ = torsion(circle, 0.0)    # τ = 0 (planar curve)
@@ -83,12 +83,13 @@ viviani(t) = [cos(t)^2, cos(t)*sin(t), sin(t)]
 
 frame = frenet_frame(viviani, π/6)
 ```
+-->
 
 ## Documentation
 
 For detailed documentation, examples, and API reference, visit:
 
-📚 **[Documentation](https://mirajcs.github.io/VectorUtils/)**
+📚 **[Documentation](https://mirajcs.github.io/VectorUtils.jl/)**
 
 ## Mathematical Background
 
@@ -108,11 +109,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 MIT License - see LICENSE file for details
 
+<!--
+
 ## Related Packages
 
-- [Symbolics.jl](https://github.com/JuliaSymbolics/Symbolics.jl) - Symbolic computation
-- [DifferentialEquations.jl](https://github.com/SciML/DifferentialEquations.jl) - ODE solving
-- [Plots.jl](https://github.com/JuliaPlots/Plots.jl) - Visualization
+-->
 
 ## Citation
 
@@ -120,9 +121,9 @@ If you use VectorUtils.jl in your research, please cite:
 
 ```bibtex
 @software{vectorutils_jl,
-  author = {mirajcs},
+  author = {Miraj Samarakkody},
   title = {VectorUtils.jl: Vector Calculus Tools for Parametric Curves},
-  year = {2024},
-  url = {https://github.com/mirajcs/VectorUtils}
+  year = {2025},
+  url = {https://github.com/mirajcs/VectorUtils.jl}
 }
 ```
