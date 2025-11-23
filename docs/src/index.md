@@ -1,6 +1,6 @@
-# GeometryToolkit.jl
+# ParametricCurves.jl
 
-A Julia package for geometric computations.
+A Julia package for parametric curve computations.
 
 ## Overview
 
@@ -17,7 +17,7 @@ Whether you're doing computational geometry, differential geometry, or general v
 ## Installation
 ```julia
 using Pkg
-Pkg.add("GeometryToolkit")
+Pkg.add("ParametricCurves")
 ```
 
 For symbolic computation support, also install SymPy.jl
@@ -27,7 +27,7 @@ Pkg.add("SymPy")
 
 ## Quick Start
 ```julia
-using GeometryToolkit
+using ParametricCurves
 using SymPy
 
 # Example usage

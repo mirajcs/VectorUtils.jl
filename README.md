@@ -1,4 +1,4 @@
-# GeometryToolkit.jl
+# ParametricCurves.jl
 
 [![Build Status](https://github.com/mirajcs/VectorUtils/workflows/CI/badge.svg)](https://github.com/mirajcs/VectorUtils/actions)
 [![Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://mirajcs.github.io/VectorUtils/)
@@ -17,13 +17,13 @@ A Julia package for computing symbolic and numeric vector properties of parametr
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/mirajcs/VectorUtils")
+Pkg.add(url="https://github.com/mirajcs/ParametricCurves.jl")
 ```
 
 ## Quick Example
 
 ```julia
-using GeometryToolkit
+using ParametricCurves
 
 # Define a circular helix
 r = [cos(t), sin(t), t]
@@ -89,7 +89,7 @@ frame = frenet_frame(viviani, π/6)
 
 For detailed documentation, examples, and API reference, visit:
 
-📚 **[Documentation](https://mirajcs.github.io/VectorUtils.jl/)**
+📚 **[Documentation](https://mirajcs.github.io/ParametricCurves.jl/)**
 
 
 
@@ -112,10 +112,10 @@ MIT License - see LICENSE file for details
 If you use VectorUtils.jl in your research, please cite:
 
 ```bibtex
-@software{geometrytoolkit_jl,
+@software{parametric_curves_jl,
   author = {Miraj Samarakkody},
-  title = {GeometryToolkit.jl: A Toolkit for Geometry},
+  title = {ParametricCurves.jl: A Toolkit for Parametric Curves},
   year = {2025},
-  url = {https://github.com/mirajcs/VectorUtils.jl}
+  url = {https://github.com/mirajcs/ParametricCurves.jl}
 }
 ```
